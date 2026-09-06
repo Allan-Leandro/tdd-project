@@ -1,0 +1,3 @@
+No meu projeto, isso aconteceu em duas camadas ao mesmo tempo: 
+Um Teste Funcional (que simula o usuário usando o site de verdade, com o Selenium) guiava a visão geral do que precisava ser feito, e dentro dele
+vários Testes de Unidade menores (que testam pedaços pequenos do código do Django) foram me guiando passo a passo até o Teste Funcional passar por completo.

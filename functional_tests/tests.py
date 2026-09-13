@@ -60,9 +60,35 @@ class NewVisitorTest(LiveServerTestCase):
         self.wait_for_row_in_list_table('1: Estudar testes funcionais')
         self.wait_for_row_in_list_table('2: Estudar testes de unidade')
 
-        # Maria se pergunta se o site vai lembrar da sua lista. Entao, ela verifica que
+                # Maria se pergunta se o site vai lembrar da sua lista. Entao, ela verifica que
         # o site gerou uma URL unica para ela -- existe uma explicacao sobre essa feature
+        maria_list_url = self.browser.current_url
+        self.assertRegex(maria_list_url, '/lists/.+')
 
-        # Ela visita a URL: a sua lista TODO ainda esta armazenada
+        # Agora um novo usuario, Francisco, chega ao site.
 
-        # Satisfeita, ela vai dormir
+        ## Usamos uma nova sessao de navegador para garantir que nenhuma
+        ## informacao de Maria esta vindo de cookies, etc.
+        self.browser.quit()
+        self.browser = webdriver.Firefox()
+
+        # Francisco visita a pagina inicial. Nao ha sinal da lista de Maria
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element(By.TAG_NAME, 'body').text
+        self.assertNotIn('Estudar testes funcionais', page_text)
+        self.assertNotIn('Estudar testes de unidade', page_text)
+
+        # Francisco inicia uma nova lista, entrando com um novo item.
+        # Ele e menos interessante que Maria...
+        inputbox = self.browser.find_element(By.ID, 'id_new_item')
+        inputbox.send_keys('Comprar leite')
+        inputbox.send_keys(Keys.ENTER)
+
+        # Francisco recebe sua propria URL unica
+        self.wait_for_row_in_list_table('1: Comprar leite')
+        francisco_list_url = self.browser.current_url
+        self.assertRegex(francisco_list_url, '/lists/.+')
+        self.assertNotEqual(francisco_list_url, maria_list_url)
+
+        # Novamente, nao ha sinal da lista de Maria
+        page_text = self.browser.find_element(By.TAG_NAME, 'body').text
